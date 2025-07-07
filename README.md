@@ -17,7 +17,13 @@ Welcome to the official **Zenora Linux ARM64 rootfs** for Android, designed to r
 ## 📦 How to Install (Automatic)
 
 1. Make sure you are using **Termux from F-Droid** (not Play Store)
-2. Copy-paste this into Termux:
+2. Install dependencies:
+
+```bash
+pkg update -y
+pkg install -y proot proot-distro wget curl tar zsh
+```
+3. Copy-paste this into Termux:
 
 ```bash
 curl -LO https://raw.githubusercontent.com/zenoralinux/zenora-android/main/install-zenora.sh
