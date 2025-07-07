@@ -83,7 +83,7 @@ if [ ! -f zenora-rootfs/root/.version ]; then
     touch zenora-rootfs/root/.version
 fi
 
-user="zzenora"
+user="zenora"
 home="/home/$user"
 start="sudo -u $user /bin/zsh --login"
 
@@ -119,11 +119,11 @@ cmdline="proot \
     LANG=C.UTF-8 \
     \$start"
 
-cmd="\$@"
-if [ "\$#" == "0" ]; then
-    exec \$cmdline
+cmd="$@"
+if [ "$#" == "0" ]; then
+    eval "$cmdline"
 else
-    \$cmdline -c "\$cmd"
+    eval "$cmdline -c \"$cmd\""
 fi
 EOF
 
