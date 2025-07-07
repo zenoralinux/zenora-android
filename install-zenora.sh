@@ -1,54 +1,61 @@
-#!/data/data/com.termux/files/usr/bin/bash -e
+#!/data/data/com.termux/files/usr/bin/bash
 
-# ---------- Zenora Linux | install-zenora.sh ----------
-# Website: https://zenoralinux.ir
-# Telegram: https://t.me/zenoralinux
-# GitHub: https://github.com/zenoralinux
-# ------------------------------------------------------
-
-# ====[ Colors ]====
+# Colors
+RED="\033[1;31m"
 GREEN="\033[1;32m"
 BLUE="\033[1;34m"
-RED="\033[1;31m"
 YELLOW="\033[1;33m"
 RESET="\033[0m"
 
-# ====[ Info ]====
+# Info
 ROOTFS_DIR="${HOME}/zenora-rootfs"
 BIN_FILE="$PREFIX/bin/zenora"
 ROOTFS_URL="https://github.com/zenoralinux/zenora-android/releases/latest/download/zenroalinux-arm64-rootfs.tar.gz"
 
-# ====[ Logo ]====
+# Function to exit with error message
+die() {
+    echo -e "${RED}[✘] $1${RESET}"
+    exit 1
+}
+
+# Logo
 echo -e "${BLUE}"
 echo "╔═════════════════════════════════════════════╗"
 echo "║       🚀 Installing Zenora Linux (ARM64)    ║"
 echo "╚═════════════════════════════════════════════╝"
 echo -e "${RESET}"
 
-# ====[ Step 1: Install Dependencies ]====
-echo -e "${YELLOW}[1/4] Installing dependencies...${RESET}"
-pkg update -y
-pkg install -y proot proot-distro wget curl tar zsh
+# Check internet connection
+echo -e "${YELLOW}[•] Checking internet connection...${RESET}"
+ping -c 1 -W 3 1.1.1.1 > /dev/null || die "No internet connection. Please check your network."
 
-# ====[ Step 2: Download RootFS ]====
-echo -e "${YELLOW}[2/4] Downloading latest Zenora rootfs...${RESET}"
+# Install dependencies
+echo -e "${YELLOW}[1/5] Installing required packages...${RESET}"
+pkg update -y || die "Failed to update package list."
+pkg install -y proot proot-distro wget curl tar zsh || die "Failed to install dependencies."
+
+# Download rootfs
+echo -e "${YELLOW}[2/5] Downloading rootfs...${RESET}"
 mkdir -p "$ROOTFS_DIR"
 cd "$HOME"
 
 if [ ! -f rootfs.tar.gz ]; then
-    wget -O rootfs.tar.gz "$ROOTFS_URL"
+    wget -O rootfs.tar.gz "$ROOTFS_URL" || die "Download failed. Check the URL or internet."
 fi
 
-# ====[ Step 3: Extract ]====
-echo -e "${YELLOW}[3/4] Extracting rootfs to $ROOTFS_DIR...${RESET}"
-tar -xzf rootfs.tar.gz -C "$ROOTFS_DIR" --strip-components=0
+# Verify file exists
+[ -f rootfs.tar.gz ] || die "RootFS archive not found after download."
+
+# Extract rootfs
+echo -e "${YELLOW}[3/5] Extracting rootfs...${RESET}"
+tar -xzf rootfs.tar.gz -C "$ROOTFS_DIR" --strip-components=0 || die "Extraction failed."
 rm -f rootfs.tar.gz
 
-# Ensure .version file exists
-touch "$ROOTFS_DIR/root/.version"
+# Ensure .version
+touch "$ROOTFS_DIR/root/.version" || die "Could not create .version file."
 
-# ====[ Step 4: Create launcher script ]====
-echo -e "${YELLOW}[4/4] Creating launcher at $BIN_FILE ...${RESET}"
+# Create launcher
+echo -e "${YELLOW}[4/5] Creating launcher script at $BIN_FILE...${RESET}"
 
 cat > "$BIN_FILE" << 'EOF'
 #!/data/data/com.termux/files/usr/bin/bash -e
@@ -87,31 +94,30 @@ cmdline="proot \
     -b /proc \
     -b /sys \
     -b /sdcard \
-    -b zenora-rootfs$home:/dev/shm \
-    -w $home \
+    -b zenora-rootfs\$home:/dev/shm \
+    -w \$home \
     /usr/bin/env -i \
-    HOME=$home \
+    HOME=\$home \
     PATH=/usr/local/sbin:/usr/local/bin:/bin:/usr/bin:/sbin:/usr/sbin \
-    TERM=$TERM \
+    TERM=\$TERM \
     LANG=C.UTF-8 \
-    $start"
+    \$start"
 
-cmd="$@"
-if [ "$#" == "0" ]; then
-    exec $cmdline
+cmd="\$@"
+if [ "\$#" == "0" ]; then
+    exec \$cmdline
 else
-    $cmdline -c "$cmd"
+    \$cmdline -c "\$cmd"
 fi
 EOF
 
-chmod +x "$BIN_FILE"
+chmod +x "$BIN_FILE" || die "Failed to make launcher executable."
 
-# ====[ Done ]====
-echo -e "\n${GREEN}✅ Zenora Linux has been successfully installed!${RESET}"
-echo -e "To launch: ${BLUE}zenora${RESET}"
-echo -e "To launch as root: ${BLUE}zenora -r${RESET}"
+# Finish
+echo -e "\n${GREEN}✅ Zenora Linux was successfully installed!${RESET}"
+echo -e "🔹 Launch as user: ${BLUE}zenora${RESET}"
+echo -e "🔹 Launch as root: ${BLUE}zenora -r${RESET}"
 
-# ====[ Footer ]====
-echo -e "\n${YELLOW}🔗 Website: ${RESET}https://zenoralinux.ir"
-echo -e "${YELLOW}💬 Telegram: ${RESET}https://t.me/zenoralinux"
-echo -e "${YELLOW}📦 GitHub:   ${RESET}https://github.com/zenoralinux\n"
+# Info
+echo -e "\n${YELLOW}🌐 Website:${RESET} https://zenoralinux.ir"
+echo -e "${YELLOW}💬 Telegram:${RESET} https://t.me/zenoralinux"
