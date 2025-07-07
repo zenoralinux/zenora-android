@@ -32,7 +32,7 @@ ping -c 1 -W 3 1.1.1.1 > /dev/null || die "No internet connection. Please check 
 # Install dependencies
 echo -e "${YELLOW}[1/5] Installing required packages...${RESET}"
 pkg update -y || die "Failed to update package list."
-pkg install -y proot proot-distro wget curl tar zsh || die "Failed to install dependencies."
+pkg install -y proot wget curl tar|| die "Failed to install dependencies."
 
 # Download rootfs
 echo -e "${YELLOW}[2/5] Downloading rootfs...${RESET}"
