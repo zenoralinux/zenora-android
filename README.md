@@ -1,23 +1,23 @@
 # 🧬 Zenora Linux for Android (ARM64 Termux)
 
-Welcome to the official **Zenora Linux ARM64 rootfs** for Android, specially designed to run inside **Termux** using `proot`.
+Welcome to the official **Zenora Linux ARM64 rootfs** for Android, designed to run smoothly inside **Termux** using `proot`.
 
 ---
 
 ## 🚀 Features
 
-- Minimal and fast Arch-based rootfs
-- Preconfigured with ZSH, `powerlevel10k`, `neofetch`, and more
-- Supports sudo, man pages, fake APT, custom configurations
-- Root and user login options
-- Ready for daily use and development inside Termux
+- Arch-based lightweight rootfs
+- Preinstalled ZSH, powerlevel10k, neofetch
+- Supports `sudo`, man pages, fake-APT and more
+- Auto-login for normal user and root support (`-r`)
+- Clean and user-friendly ZSH experience
 
 ---
 
-## 📦 How to Install
+## 📦 How to Install (Automatic)
 
-1. Open Termux (preferably updated)
-2. Run this one-liner:
+1. Make sure you are using **Termux from F-Droid** (not Play Store)
+2. Copy-paste this into Termux:
 
 ```bash
 curl -LO https://raw.githubusercontent.com/zenoralinux/zenora-android/main/install-zenora.sh
@@ -26,7 +26,58 @@ bash install-zenora.sh
 
 ---
 
-## 💻 How to Use
+## 🧰 Manual Installation (Advanced Users)
+
+If the automatic installer fails or you prefer manual setup:
+
+### 1. Install dependencies:
+
+```bash
+pkg update -y
+pkg install -y proot proot-distro wget curl tar zsh
+```
+
+### 2. Download and extract the rootfs:
+
+```bash
+wget -O rootfs.tar.gz https://github.com/zenoralinux/zenora-android/releases/latest/download/zenroalinux-arm64-rootfs.tar.gz
+mkdir -p ~/zenora-rootfs
+tar -xzf rootfs.tar.gz -C ~/zenora-rootfs --strip-components=0
+rm rootfs.tar.gz
+```
+
+### 3. Create `.version` file:
+
+```bash
+touch ~/zenora-rootfs/root/.version
+```
+
+### 4. Create a launcher script at `$PREFIX/bin/zenora` (or run `install-zenora.sh`)
+
+---
+
+## 📁 Termux Storage Access (Needed for File Sharing)
+
+If you want Zenora to access your **Downloads**, **DCIM**, or **shared storage**, you must grant storage permissions:
+
+### Method 1: Via Command
+
+```bash
+termux-setup-storage
+```
+
+* You will see a permission popup → tap "Allow"
+* This creates the `/sdcard` symlink in Termux
+
+### Method 2: Manually via Android Settings
+
+1. Open **Android Settings**
+2. Go to **Apps > Termux > Permissions**
+3. Enable **Files and media** or **All files access** (depending on your Android version)
+
+---
+
+## 💻 How to Use Zenora
 
 ### Login as regular user:
 
@@ -40,15 +91,17 @@ zenora
 zenora -r
 ```
 
-> If `zenora` is not recognized, restart your Termux or run: `source ~/.bashrc` or `hash -r`
+> If `zenora` is not recognized, run `hash -r` or restart Termux
 
 ---
 
-## 📂 Files and Structure
+## 📂 Directory Structure
 
-* `zenora-rootfs/`: Contains the extracted root filesystem
-* `$PREFIX/bin/zenora`: Executable launcher script
-* `.version`: Empty marker file for compatibility
+| Path                 | Description               |
+| -------------------- | ------------------------- |
+| `~/zenora-rootfs/`   | Extracted root filesystem |
+| `$PREFIX/bin/zenora` | Launcher script           |
+| `.version`           | Compatibility marker file |
 
 ---
 
@@ -63,4 +116,4 @@ zenora -r
 ## 🛠 Maintained by
 
 **Zenora Linux Team**
-Maintainer: [@miladalizadeh](https://instagram.com/miladalizadew)
+Maintainer: [@miladalizadeh](https://github.com/miladalizadeh)
