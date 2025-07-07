@@ -35,7 +35,7 @@ ping -c 1 1.1.1.1 >/dev/null 2>&1 || error_exit "No internet connection."
 # Step 2: Install required packages
 log "Checking required packages..."
 
-REQUIRED_PKGS=(proot proot-distro wget curl tar bsdtar zsh)
+REQUIRED_PKGS=(proot wget curl bsdtar )
 for pkg in "${REQUIRED_PKGS[@]}"; do
     if ! check_command "$pkg"; then
         log "Installing $pkg..."
