@@ -32,9 +32,17 @@ echo -e "╚══════════════════════�
 log "Checking internet connectivity..."
 ping -c 1 1.1.1.1 >/dev/null 2>&1 || error_exit "No internet connection."
 
+export DEBIAN_FRONTEND=noninteractive
+
+echo "[*] Updating packages..."
+pkg update -y
+
+echo "[*] Upgrading packages..."
+apt upgrade -y \
+  -o Dpkg::Options::="--force-confdef" \
+  -o Dpkg::Options::="--force-confold"
 # Step 2: Install required packages
 log "Checking required packages..."
-
 REQUIRED_PKGS=(proot wget curl bsdtar )
 for pkg in "${REQUIRED_PKGS[@]}"; do
     if ! check_command "$pkg"; then
