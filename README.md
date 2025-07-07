@@ -21,7 +21,7 @@ Welcome to the official **Zenora Linux ARM64 rootfs** for Android, designed to r
 
 ```bash
 pkg update -y
-pkg install -y proot proot-distro wget curl tar zsh
+pkg install -y proot wget curl bsdtar
 ```
 3. Copy-paste this into Termux:
 
