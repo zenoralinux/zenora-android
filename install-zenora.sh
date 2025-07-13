@@ -85,39 +85,47 @@ fi
 
 user="zenora"
 home="/home/$user"
-start="sudo -u $user /bin/zsh --login"
+start="/bin/zsh --login"
+as_root="false"
 
-if grep -q "$user" zenora-rootfs/etc/passwd; then
-    ZENORAUSR="1"
-else
-    ZENORAUSR="0"
+# بررسی اینکه کاربر zenora تعریف شده یا نه
+if ! grep -q "$user" zenora-rootfs/etc/passwd; then
+    as_root="true"
 fi
 
-if [[ $ZENORAUSR == "0" || ("$#" != "0" && ("$1" == "-r" || "$1" == "-R")) ]]; then
+# اگر با -r یا -R اجرا شده باشه => root
+if [[ "$#" != "0" && ("$1" == "-r" || "$1" == "-R") ]]; then
+    as_root="true"
+    shift
+fi
+
+# اگر root mode فعال بود، تغییر مسیر home و shell
+if [[ "$as_root" == "true" ]]; then
     user="root"
     home="/root"
     start="/bin/zsh --login"
-    if [[ "$#" != "0" && ("$1" == "-r" || "$1" == "-R") ]]; then
-        shift
-    fi
+    proot_uid_flag="-0"
+else
+    proot_uid_flag=""  # یعنی بدون -0 اجرا بشه
 fi
 
 cmdline="proot \
     --link2symlink \
-    -0 \
+    $proot_uid_flag \
     -r zenora-rootfs \
     -b /dev \
     -b /proc \
     -b /sys \
     -b /sdcard \
-    -b zenora-rootfs\$home:/dev/shm \
-    -w \$home \
+    -b zenora-rootfs$home:/dev/shm \
+    -w $home \
     /usr/bin/env -i \
-    HOME=\$home \
+    HOME=$home \
+    USER=$user \
     PATH=/usr/local/sbin:/usr/local/bin:/bin:/usr/bin:/sbin:/usr/sbin \
-    TERM=\$TERM \
+    TERM=$TERM \
     LANG=C.UTF-8 \
-    \$start"
+    $start"
 
 cmd="$@"
 if [ "$#" == "0" ]; then
